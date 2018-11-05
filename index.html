@@ -205,7 +205,7 @@
 
 <div class="post-preview">
 
-    <a href="/2018/11/05/TF-ptb语言模型的train过程：/">
+    <a href="/2018/11/05/TensorFlow 命名空间/">
         <h2 class="post-title">
             Untitled
         </h2>
@@ -213,8 +213,9 @@
             
         </h3>
         <div class="post-content-preview">
-            TF-ptb语言模型的train过程：先计算loss，这里使用了tf.contrib.seq2seq.sequence_loss
-123456789101112# 损失函数# Use the contrib sequence loss and average over the batches# 计算损失loss = tf.contrib.seq2seq.sequence_loss(    l......
+            TensorFlow 命名空间tf.placeholder() tf.Variable() tf.get_variable() 的区别：官方API说明：
+tf.placeholder12345placeholder(    dtype,    shape=None,    name=None)
+Inserts a placeholder for a tensor that will be a......
         </div>
     </a>
     <p class="post-meta">
@@ -252,7 +253,7 @@
 
 <div class="post-preview">
 
-    <a href="/2018/11/05/TensorFlow 命名空间/">
+    <a href="/2018/11/05/TF-ptb语言模型的train过程：/">
         <h2 class="post-title">
             Untitled
         </h2>
@@ -260,9 +261,8 @@
             
         </h3>
         <div class="post-content-preview">
-            TensorFlow 命名空间tf.placeholder() tf.Variable() tf.get_variable() 的区别：官方API说明：
-tf.placeholder12345placeholder(    dtype,    shape=None,    name=None)
-Inserts a placeholder for a tensor that will be a......
+            TF-ptb语言模型的train过程：先计算loss，这里使用了tf.contrib.seq2seq.sequence_loss
+123456789101112# 损失函数# Use the contrib sequence loss and average over the batches# 计算损失loss = tf.contrib.seq2seq.sequence_loss(    l......
         </div>
     </a>
     <p class="post-meta">
