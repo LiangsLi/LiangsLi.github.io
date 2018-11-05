@@ -13,7 +13,7 @@
 
     <title>
         
-          seq2seq学习路线图 - LiangsLi&#39; Blog | LiangsLi&#39;s Page
+          LiangsLi&#39; Blog | LiangsLi&#39;s Page
         
     </title>
 
@@ -166,7 +166,7 @@
                     <div class="tags">
                         
                     </div>
-                    <h1>seq2seq学习路线图</h1>
+                    <h1></h1>
                     <h2 class="subheading"></h2>
                     <span class="meta">
                         Posted by LiangsLi on
@@ -189,7 +189,20 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                
+                <h1 id="seq2seq学习路线图"><a href="#seq2seq学习路线图" class="headerlink" title="seq2seq学习路线图"></a>seq2seq学习路线图</h1><h2 id="0-RNN基础"><a href="#0-RNN基础" class="headerlink" title="0.RNN基础:"></a>0.RNN基础:</h2><p>推荐资料：<code>Hands-On Machine Learning with Scikit-Learn and TensorFlow</code>一书的第十四章等</p>
+<h2 id="1-Understanding-LSTM-Networks"><a href="#1-Understanding-LSTM-Networks" class="headerlink" title="1.Understanding LSTM Networks"></a>1.<a href="http://colah.github.io/posts/2015-08-Understanding-LSTMs/" target="_blank" rel="noopener">Understanding LSTM Networks</a></h2><p>推荐：★★★★★</p>
+<p>本文详细解释了LSTM和其变种</p>
+<h2 id="2-ATTENTION-MECHANISM"><a href="#2-ATTENTION-MECHANISM" class="headerlink" title="2.ATTENTION MECHANISM"></a>2.<a href="https://blog.heuritech.com/2016/01/20/attention-mechanism/" target="_blank" rel="noopener">ATTENTION MECHANISM</a></h2><p>推荐：★★★★</p>
+<p>本文以图像标题生成任务为例解释了attention机制的原理，讨论了<code>soft/hard attention</code>的区别</p>
+<h2 id="3-Soft-attention-vs-hard-attention"><a href="#3-Soft-attention-vs-hard-attention" class="headerlink" title="3.Soft attention vs. hard attention"></a>3.<a href="https://stackoverflow.com/questions/35549588/soft-attention-vs-hard-attention" target="_blank" rel="noopener">Soft attention vs. hard attention</a></h2><p>推荐：★★★</p>
+<p>进一步解释了<code>soft/hard attention</code>的区别（hard attention 仅做基本了解即可）</p>
+<h2 id="4-CS224n-2017-winter-lecture-notes-6"><a href="#4-CS224n-2017-winter-lecture-notes-6" class="headerlink" title="4.CS224n 2017 winter lecture notes 6"></a>4.<a href="https://github.com/LiangsLi/cs224n-winter-2017/blob/master/lecture_notes/cs224n-2017-notes6.pdf" target="_blank" rel="noopener">CS224n 2017 winter lecture notes 6</a></h2><p>推荐：★★★★★</p>
+<p>本文以神经机器翻译（NMT）为例解释了seq2seq（encoder-decoder）模型，讨论了两种不同的soft attention机制： <code>BahdanauAttention</code>和<code>LuongAttention</code>（这两种也是TensorFlow支持的两种attention基础实现），尤其是对<code>BahdanauAttention</code>做了详细解释。本文还讲了其他NMT问题</p>
+<h2 id="5-Effective-Approaches-to-Attention-based-Neural-Machine-Translation"><a href="#5-Effective-Approaches-to-Attention-based-Neural-Machine-Translation" class="headerlink" title="5.Effective Approaches to Attention-based Neural Machine Translation"></a>5.<a href="http://aclweb.org/anthology/D15-1166" target="_blank" rel="noopener">Effective Approaches to Attention-based Neural Machine Translation</a></h2><p>推荐：★★★★</p>
+<p>本文是<code>LuongAttention</code>机制的提出论文，其包含两种不同的attention：<code>global</code>和<code>local</code>（注意本文中decoder没有用RNN），这两种的区别在于<code>注意力机制</code>关注的源数据的多少</p>
+<h2 id="6-Neural-Machine-Translation-seq2seq-Tutorial"><a href="#6-Neural-Machine-Translation-seq2seq-Tutorial" class="headerlink" title="6.Neural Machine Translation (seq2seq) Tutorial"></a>6.<a href="https://www.tensorflow.org/tutorials/seq2seq" target="_blank" rel="noopener">Neural Machine Translation (seq2seq) Tutorial</a></h2><p>推荐：★★★★</p>
+<p>TensorFlow官方seq2seq教程，基于神经机器翻译</p>
+
 
                 <hr>
 
@@ -197,13 +210,9 @@
 
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/2018/11/05/命名空间/" data-toggle="tooltip" data-placement="top" title="命名空间">&larr; Previous Post</a>
-                        </li>
-                    
                     
                         <li class="next">
-                            <a href="/2018/11/05/排序总结/" data-toggle="tooltip" data-placement="top" title="排序总结">Next Post &rarr;</a>
+                            <a href="/2018/11/05/TF-ptb语言模型的train过程：/" data-toggle="tooltip" data-placement="top" title="">Next Post &rarr;</a>
                         </li>
                     
                 </ul>

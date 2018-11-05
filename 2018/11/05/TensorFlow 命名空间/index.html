@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          LiangsLi&#39; Blog | LiangsLi&#39;s Page
+        
+    </title>
+
+    <link rel="canonical" href="https://liangsli.github.io/2018/11/05/TensorFlow 命名空间/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">LiangsLi&#39;s Page</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://liangsli.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/img/home.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                    </div>
+                    <h1></h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by LiangsLi on
+                        2018-11-05
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1 id="TensorFlow-命名空间"><a href="#TensorFlow-命名空间" class="headerlink" title="TensorFlow 命名空间"></a>TensorFlow 命名空间</h1><h2 id="tf-placeholder-tf-Variable-tf-get-variable-的区别："><a href="#tf-placeholder-tf-Variable-tf-get-variable-的区别：" class="headerlink" title="tf.placeholder() tf.Variable() tf.get_variable() 的区别："></a>tf.placeholder() tf.Variable() tf.get_variable() 的区别：</h2><p>官方API说明：</p>
+<h3 id="tf-placeholder"><a href="#tf-placeholder" class="headerlink" title="tf.placeholder"></a><a href="https://www.tensorflow.org/api_docs/python/tf/placeholder" target="_blank" rel="noopener">tf.placeholder</a></h3><figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">placeholder(</span><br><span class="line">    dtype,</span><br><span class="line">    <span class="built_in">shape</span>=<span class="keyword">None</span>,</span><br><span class="line">    <span class="keyword">name</span>=<span class="keyword">None</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>Inserts a placeholder for a tensor that will be always fed. 为一个之后被fed的tensor设置占位符</p>
+<p>Important: This tensor will produce an error if evaluated. Its value must be fed using the <code>feed_dict</code>optional argument to <code>Session.run()</code>, <code>Tensor.eval()</code>, or <code>Operation.run()</code>. 不可以直接取值，必须使用feed_dict传值</p>
+<h3 id="tf-Variable"><a href="#tf-Variable" class="headerlink" title="tf.Variable"></a><a href="https://www.tensorflow.org/api_docs/python/tf/Variable" target="_blank" rel="noopener">tf.Variable</a></h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">__init__(</span><br><span class="line">    <span class="attribute">initial_value</span>=None,</span><br><span class="line">    <span class="attribute">trainable</span>=<span class="literal">True</span>,</span><br><span class="line">    <span class="attribute">collections</span>=None,</span><br><span class="line">    <span class="attribute">validate_shape</span>=<span class="literal">True</span>,</span><br><span class="line">    <span class="attribute">caching_device</span>=None,</span><br><span class="line">    <span class="attribute">name</span>=None,</span><br><span class="line">    <span class="attribute">variable_def</span>=None,</span><br><span class="line">    <span class="attribute">dtype</span>=None,</span><br><span class="line">    <span class="attribute">expected_shape</span>=None,</span><br><span class="line">    <span class="attribute">import_scope</span>=None,</span><br><span class="line">    <span class="attribute">constraint</span>=None</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>A variable maintains state in the graph across calls to run(). You add a variable to the graph by constructing an instance of the class Variable.</p>
+<p>Creates a new variable with value initial_value.</p>
+<p>The new variable is added to the graph collections listed in collections, which defaults to [GraphKeys.GLOBAL_VARIABLES].</p>
+<p>If trainable is True the variable is also added to the graph collection GraphKeys.TRAINABLE_VARIABLES.</p>
+<p>This constructor creates both a variable Op and an assign Op to set the variable to its initial value.</p>
+<h3 id="tf-get-variable"><a href="#tf-get-variable" class="headerlink" title="tf.get_variable"></a><a href="https://www.tensorflow.org/api_docs/python/tf/get_variable" target="_blank" rel="noopener">tf.get_variable</a></h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">get_variable(</span><br><span class="line">    name,</span><br><span class="line">    <span class="attribute">shape</span>=None,</span><br><span class="line">    <span class="attribute">dtype</span>=None,</span><br><span class="line">    <span class="attribute">initializer</span>=None,</span><br><span class="line">    <span class="attribute">regularizer</span>=None,</span><br><span class="line">    <span class="attribute">trainable</span>=<span class="literal">True</span>,</span><br><span class="line">    <span class="attribute">collections</span>=None,</span><br><span class="line">    <span class="attribute">caching_device</span>=None,</span><br><span class="line">    <span class="attribute">partitioner</span>=None,</span><br><span class="line">    <span class="attribute">validate_shape</span>=<span class="literal">True</span>,</span><br><span class="line">    <span class="attribute">use_resource</span>=None,</span><br><span class="line">    <span class="attribute">custom_getter</span>=None,</span><br><span class="line">    <span class="attribute">constraint</span>=None</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>Gets an existing variable with these parameters or create a new one.获取一个已经存在的变量或者创建一个新变量</p>
+<p>This function prefixes the name with the current variable scope and performs reuse checks. See the <a href="https://www.tensorflow.org/programmers_guide/variables" target="_blank" rel="noopener">Variable Scope How To</a> for an extensive description of how reusing works.</p>
+<p>这三种方式所定义的变量具有相同的类型。而且只有 tf.get_variable() 创建的变量之间会发生命名冲突。在实际使用中，三种创建变量方式的用途也是分工非常明确的。其中：</p>
+<ul>
+<li><strong>tf.placeholder()</strong> 占位符。<code>name</code>参数取值可以重复，如果重复则会自动在后面加下划线和数字区别，<code>trainable</code>为False</li>
+<li><strong>tf.Variable()</strong> 一般变量用这种方式定义。<code>name</code>参数取值可以重复，如果重复则会自动在后面加下划线和数字区别，<code>trainable</code>默认为True</li>
+<li><strong>tf.get_variable()</strong> 一般都是和 <code>tf.variable_scope()</code> 配合使用，从而实现变量共享的功能。<code>name</code>参数取值<strong>不</strong>可以重复（不允许重名），<code>trainable</code>默认为True</li>
+</ul>
+<h2 id="name-scope-与-variable-scope的区别："><a href="#name-scope-与-variable-scope的区别：" class="headerlink" title="name_scope 与 variable_scope的区别："></a>name_scope 与 variable_scope的区别：</h2><ul>
+<li><strong>name_scope:</strong> 为了更好地管理变量的命名空间而提出的。比如在 tensorboard 中，因为引入了 name_scope， 我们的 Graph 看起来才井然有序。</li>
+<li><strong>variable_scope:</strong> 大部分情况下，跟 tf.get_variable() 配合使用，实现变量共享的功能。</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">with tf.name_scope(<span class="string">'nsc1'</span>):</span><br><span class="line">    v1 = tf.Variable([<span class="number">1</span>], name=<span class="string">'v1'</span>)</span><br><span class="line">    with tf.variable_scope(<span class="string">'vsc1'</span>):</span><br><span class="line">        v2 = tf.Variable([<span class="number">1</span>], name=<span class="string">'v2'</span>)</span><br><span class="line">        v3 = tf.get_variable(name=<span class="string">'v3'</span>, shape=[])</span><br><span class="line">print <span class="string">'v1.name: '</span>, v1.name</span><br><span class="line">print <span class="string">'v2.name: '</span>, v2.name</span><br><span class="line">print <span class="string">'v3.name: '</span>, v3.name</span><br><span class="line"></span><br><span class="line">with tf.name_scope(<span class="string">'nsc1'</span>):</span><br><span class="line">    v4 = tf.Variable([<span class="number">1</span>], name=<span class="string">'v4'</span>)</span><br><span class="line">print <span class="string">'v4.name: '</span>, v4.name</span><br><span class="line">#输出：</span><br><span class="line">&gt;&gt;&gt;v1<span class="selector-class">.name</span>:  nsc1/v1:<span class="number">0</span></span><br><span class="line">&gt;&gt;&gt;v2<span class="selector-class">.name</span>:  nsc1/vsc1/v2:<span class="number">0</span></span><br><span class="line">&gt;&gt;&gt;v3<span class="selector-class">.name</span>:  vsc1/v3:<span class="number">0</span></span><br><span class="line">&gt;&gt;&gt;v4<span class="selector-class">.name</span>:  nsc1_1/v4:<span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>tf.name_scope() 并不会对 tf.get_variable() 创建的变量有任何影响。<br>tf.name_scope() 主要是用来管理命名空间的，这样子让我们的整个模型更加有条理。<br>而 tf.variable_scope() 的作用是为了实现变量共享，它和 tf.get_variable() 来完成变量共享的功能。<br>tf.variable_scope可以让变量有相同的命名，包括tf.get_variable得到的变量，还有tf.Variable的变量<br>tf.name_scope可以让变量有相同的命名，只是限于tf.Variable的变量</p>
+<h3 id="使用tf-Variable-实现两层卷积网络："><a href="#使用tf-Variable-实现两层卷积网络：" class="headerlink" title="使用tf.Variable()实现两层卷积网络："></a>使用tf.Variable()实现两层卷积网络：</h3><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 拿官方的例子改动一下</span></span><br><span class="line">def my_image_filter():</span><br><span class="line">    <span class="attr">conv1_weights</span> = tf.Variable(tf.random_normal([<span class="number">5</span>, <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>]),</span><br><span class="line">        <span class="attr">name="conv1_weights")</span></span><br><span class="line">    <span class="attr">conv1_biases</span> = tf.Variable(tf.zeros([<span class="number">32</span>]), <span class="attr">name="conv1_biases")</span></span><br><span class="line">    <span class="attr">conv2_weights</span> = tf.Variable(tf.random_normal([<span class="number">5</span>, <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>]),</span><br><span class="line">        <span class="attr">name="conv2_weights")</span></span><br><span class="line">    <span class="attr">conv2_biases</span> = tf.Variable(tf.zeros([<span class="number">32</span>]), <span class="attr">name="conv2_biases")</span></span><br><span class="line">    return None</span><br><span class="line"></span><br><span class="line"><span class="comment"># First call creates one set of 4 variables.</span></span><br><span class="line"><span class="attr">result1</span> = my_image_filter()</span><br><span class="line"><span class="comment"># Another set of 4 variables is created in the second call.</span></span><br><span class="line"><span class="attr">result2</span> = my_image_filter()</span><br><span class="line"><span class="comment"># 获取所有的可训练变量</span></span><br><span class="line"><span class="attr">vs</span> = tf.trainable_variables()</span><br><span class="line">print 'There are %d train_able_variables <span class="keyword">in</span> the Graph: ' % len(vs)</span><br><span class="line">for v <span class="keyword">in</span> vs:</span><br><span class="line">    print v</span><br><span class="line"><span class="comment">#输出：</span></span><br><span class="line">&gt;&gt;&gt;There are <span class="number">8</span> train_able_variables <span class="keyword">in</span> the Graph:</span><br><span class="line">&gt;&gt;&gt;Tensor(<span class="string">"conv1_weights/read:0"</span>, <span class="attr">shape=(5,</span> <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>), <span class="attr">dtype=float32)</span></span><br><span class="line">&gt;&gt;&gt;Tensor(<span class="string">"conv1_biases/read:0"</span>, <span class="attr">shape=(32,),</span> <span class="attr">dtype=float32)</span></span><br><span class="line">&gt;&gt;&gt;Tensor(<span class="string">"conv2_weights/read:0"</span>, <span class="attr">shape=(5,</span> <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>), <span class="attr">dtype=float32)</span></span><br><span class="line">&gt;&gt;&gt;Tensor(<span class="string">"conv2_biases/read:0"</span>, <span class="attr">shape=(32,),</span> <span class="attr">dtype=float32)</span></span><br><span class="line">&gt;&gt;&gt;Tensor(<span class="string">"conv1_weights_1/read:0"</span>, <span class="attr">shape=(5,</span> <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>), <span class="attr">dtype=float32)</span></span><br><span class="line">&gt;&gt;&gt;Tensor(<span class="string">"conv1_biases_1/read:0"</span>, <span class="attr">shape=(32,),</span> <span class="attr">dtype=float32)</span></span><br><span class="line">&gt;&gt;&gt;Tensor(<span class="string">"conv2_weights_1/read:0"</span>, <span class="attr">shape=(5,</span> <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>), <span class="attr">dtype=float32)</span></span><br><span class="line">&gt;&gt;&gt;Tensor(<span class="string">"conv2_biases_1/read:0"</span>, <span class="attr">shape=(32,),</span> <span class="attr">dtype=float32)</span></span><br></pre></td></tr></table></figure>
+<h3 id="使用tf-get-variable-与tf-variable-scope-定义两层卷积网络："><a href="#使用tf-get-variable-与tf-variable-scope-定义两层卷积网络：" class="headerlink" title="使用tf.get_variable()与tf.variable_scope()定义两层卷积网络："></a>使用tf.get_variable()与tf.variable_scope()定义两层卷积网络：</h3><p>如果想要达到重复利用变量的效果, 我们就要使用 <code>tf.variable_scope()</code>, 并搭配 <code>tf.get_variable()</code> 这种方式产生和提取变量. 不像 tf.Variable() 每次都会产生新的变量, tf.get_variable() 如果遇到了同样名字的变量时, 它会单纯的提取这个同样名字的变量(避免产生新变量). 而在重复使用的时候, 一定要在代码中强调 <code>scope.reuse_variables()</code>, 否则系统将会报错, 以为你只是单纯的不小心重复使用到了一个变量.</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 下面是定义一个卷积层的通用方式</span></span><br><span class="line">def conv_relu(kernel_shape, bias_shape):</span><br><span class="line">    <span class="comment"># Create variable named "weights".</span></span><br><span class="line">    <span class="attr">weights</span> = tf.get_variable(<span class="string">"weights"</span>, kernel_shape, <span class="attr">initializer=tf.random_normal_initializer())</span></span><br><span class="line">    <span class="comment"># Create variable named "biases".</span></span><br><span class="line">    <span class="attr">biases</span> = tf.get_variable(<span class="string">"biases"</span>, bias_shape, <span class="attr">initializer=tf.constant_initializer(0.0))</span></span><br><span class="line">    return None</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def my_image_filter():</span><br><span class="line">    <span class="comment"># 按照下面的方式定义卷积层，非常直观，而且富有层次感</span></span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">"conv1"</span>):</span><br><span class="line">        <span class="comment"># Variables created here will be named "conv1/weights", "conv1/biases".</span></span><br><span class="line">        <span class="attr">relu1</span> = conv_relu([<span class="number">5</span>, <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>], [<span class="number">32</span>])</span><br><span class="line">    <span class="keyword">with</span> tf.variable_scope(<span class="string">"conv2"</span>):</span><br><span class="line">        <span class="comment"># Variables created here will be named "conv2/weights", "conv2/biases".</span></span><br><span class="line">        return conv_relu( [<span class="number">5</span>, <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>], [<span class="number">32</span>])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> tf.variable_scope(<span class="string">"image_filters"</span>) as scope:</span><br><span class="line">    <span class="comment"># 下面我们两次调用 my_image_filter 函数，但是由于引入了 变量共享机制</span></span><br><span class="line">    <span class="comment"># 可以看到我们只是创建了一遍网络结构。</span></span><br><span class="line">    <span class="attr">result1</span> = my_image_filter()</span><br><span class="line">    scope.reuse_variables()</span><br><span class="line">    <span class="attr">result2</span> = my_image_filter()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 看看下面，完美地实现了变量共享！！！</span></span><br><span class="line"><span class="attr">vs</span> = tf.trainable_variables()</span><br><span class="line">print 'There are %d train_able_variables <span class="keyword">in</span> the Graph: ' % len(vs)</span><br><span class="line">for v <span class="keyword">in</span> vs:</span><br><span class="line">    print v</span><br><span class="line"><span class="comment">#输出：</span></span><br><span class="line">&gt;&gt;&gt;There are <span class="number">4</span> train_able_variables <span class="keyword">in</span> the Graph:</span><br><span class="line">&gt;&gt;&gt;Tensor(<span class="string">"image_filters/conv1/weights/read:0"</span>, <span class="attr">shape=(5,</span> <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>), <span class="attr">dtype=float32)</span></span><br><span class="line">&gt;&gt;&gt;Tensor(<span class="string">"image_filters/conv1/biases/read:0"</span>, <span class="attr">shape=(32,),</span> <span class="attr">dtype=float32)</span></span><br><span class="line">&gt;&gt;&gt;Tensor(<span class="string">"image_filters/conv2/weights/read:0"</span>, <span class="attr">shape=(5,</span> <span class="number">5</span>, <span class="number">32</span>, <span class="number">32</span>), <span class="attr">dtype=float32)</span></span><br><span class="line">&gt;&gt;&gt;Tensor(<span class="string">"image_filters/conv2/biases/read:0"</span>, <span class="attr">shape=(32,),</span> <span class="attr">dtype=float32)</span></span><br></pre></td></tr></table></figure>
+<p>在 TensorFlow 中，我们定义一个变量，相当于往 Graph 中添加了一个节点。和普通的 python 函数不一样，在一般的函数中，我们对输入进行处理，然后返回一个结果，而函数里边定义的一些局部变量我们就不管了。但是在 TensorFlow 中，我们在函数里边创建了一个变量，就是往 Graph 中添加了一个节点。出了这个函数后，这个节点还是存在于 Graph 中的。</p>
+<blockquote>
+<p>如果使用Variable 的话每次都会新建变量，但是大多数时候我们是希望一些变量重用的，所以就用到了get_variable()。它会去搜索变量名，然后没有就新建，有就直接用。既然用到变量名了，就涉及到了名字域的概念。通过不同的域来区别变量名，毕竟让我们给所有变量都直接取不同名字还是有点辛苦的。所以为什么会有scope 的概念。name_scope 作用于操作，variable_scope 可以通过设置reuse 标志以及初始化方式来影响域下的变量。当然对我们而言还有个更直观的感受就是：在tensorboard 里可视化的时候用名字域进行封装后会更清晰</p>
+<p>作者：ycszen 来源：知乎</p>
+<p>TensorFlow里创建变量的两种方式有 tf.get_variable() 和 tf.Variable() ，区别 @lqfarmer 的答案已经说的很清楚了。在 tf.name_scope下时，tf.get_variable()创建的变量名不受 name_scope 的影响，而且在未指定共享变量时，如果重名会报错，tf.Variable()会自动检测有没有变量重名，如果有则会自行处理。</p>
+<p>作者：C Li 来源：知乎</p>
+</blockquote>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2018/11/05/TF-ptb语言模型的train过程：/" data-toggle="tooltip" data-placement="top" title="">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2018/11/05/Pytorch-Autograd mechanics 笔记/" data-toggle="tooltip" data-placement="top" title="">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="null" target="_blank">null</a></li>
+                    
+                        <li><a href="null" target="_blank">null</a></li>
+                    
+                        <li><a href="#" target="_blank">Foo</a></li>
+                    
+                        <li><a href="#" target="_blank">Bar</a></li>
+                    
+                        <li><a href="#" target="_blank">Example Friends</a></li>
+                    
+                        <li><a href="#" target="_blank">It helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "hexo-theme-huxblog";
+    var disqus_identifier = "https://liangsli.github.io/2018/11/05/TensorFlow 命名空间/";
+    var disqus_url = "https://liangsli.github.io/2018/11/05/TensorFlow 命名空间/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                    <li>
+                        <a target="_blank" href="https://twitter.com/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+                
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="http://weibo.com/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.facebook.com/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.linkedin.com/in/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; LiangsLi&#39;s Page 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    Ported by <a href="http://blog.kaijun.rocks">Kaijun</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=kaijun&repo=hexo-theme-huxblog&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://liangsli.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = '4cc1f2d8f3067386cc5cdb626a202900';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<!-- Side Catalog -->
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://liangsli.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

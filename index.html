@@ -184,15 +184,132 @@
 
 <div class="post-preview">
 
-    <a href="/2018/11/05/面向对象编程/">
+    <a href="/2018/11/05/seq2seq学习路线图/">
         <h2 class="post-title">
-            面向对象编程
+            Untitled
         </h2>
         <h3 class="post-subtitle">
             
         </h3>
         <div class="post-content-preview">
-            ...
+            seq2seq学习路线图0.RNN基础:推荐资料：Hands-On Machine Learning with Scikit-Learn and TensorFlow一书的第十四章等
+1.Understanding LSTM Networks推荐：★★★★★
+本文详细解释了LSTM和其变种
+2.ATTENTION MECHANISM推荐：★★★★
+本文以图像标题生成任务为例解释了attent......
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by LiangsLi on
+        2018-11-05
+    </p>
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2018/11/05/TF-ptb语言模型的train过程：/">
+        <h2 class="post-title">
+            Untitled
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            TF-ptb语言模型的train过程：先计算loss，这里使用了tf.contrib.seq2seq.sequence_loss
+123456789101112# 损失函数# Use the contrib sequence loss and average over the batches# 计算损失loss = tf.contrib.seq2seq.sequence_loss(    l......
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by LiangsLi on
+        2018-11-05
+    </p>
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2018/11/05/TensorFlow 命名空间/">
+        <h2 class="post-title">
+            Untitled
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            TensorFlow 命名空间tf.placeholder() tf.Variable() tf.get_variable() 的区别：官方API说明：
+tf.placeholder12345placeholder(    dtype,    shape=None,    name=None)
+Inserts a placeholder for a tensor that will be a......
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by LiangsLi on
+        2018-11-05
+    </p>
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2018/11/05/Pytorch-Autograd mechanics 笔记/">
+        <h2 class="post-title">
+            Untitled
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            Autograd mechanics 笔记在反向传播中排除子图Every Tensor has a flag: requires_grad that allows for fine grained exclusion of subgraphs from gradient computation and can increase efficiency.
+每个tensor都有一个requires......
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by LiangsLi on
+        2018-11-05
+    </p>
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2018/11/05/Python命令行命令解析器argparse使用总结/">
+        <h2 class="post-title">
+            Untitled
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            Python命令行命令解析器argparse使用总结TensorFlow项目中一般都需要我们通过命令行传入参数以配置网络细节和训练过程，TensorFlow项目一般存在两种参数传递方式：一种是采用TensorFlow的tf.flags子模块，一种是使用argparse，argparse是python原生支持的命令行参数解析器，其支持所有的Python项目而不仅仅是TensorFlow项目，具......
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by LiangsLi on
+        2018-11-05
+    </p>
+
+</div>
+<hr>
+
+<div class="post-preview">
+
+    <a href="/2018/11/05/Python 面向对象编程/">
+        <h2 class="post-title">
+            Python 面向对象编程
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+        <div class="post-content-preview">
+            Python 面向对象编程1. 模块与包：在Python中，一个.py文件就称之为一个模块（Module）
+
+使用模块最大的好处是大大提高了代码的可维护性。其次，编写代码不必从零开始。当一个模块编写完毕，就可以被其他地方引用。我们在编写程序的时候，也经常引用其他模块，包括Python内置的模块和来自第三方的模块。使用模块还可以避免函数名和变量名冲突。
+
+为了避免模块名冲突，Python又引入......
         </div>
     </a>
     <p class="post-meta">
@@ -229,27 +346,6 @@
     <a href="/2018/11/05/命名空间/">
         <h2 class="post-title">
             命名空间
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            ...
-        </div>
-    </a>
-    <p class="post-meta">
-        Posted by LiangsLi on
-        2018-11-05
-    </p>
-
-</div>
-<hr>
-
-<div class="post-preview">
-
-    <a href="/2018/11/05/seq2seq学习路线图/">
-        <h2 class="post-title">
-            seq2seq学习路线图
         </h2>
         <h3 class="post-subtitle">
             
@@ -337,6 +433,8 @@
                     <!-- no hr -->
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
+                        
+                            
                         
                     </div>
                 </section>

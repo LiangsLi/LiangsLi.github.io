@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          LiangsLi&#39; Blog | LiangsLi&#39;s Page
+        
+    </title>
+
+    <link rel="canonical" href="https://liangsli.github.io/2018/11/05/Python命令行命令解析器argparse使用总结/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">LiangsLi&#39;s Page</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://liangsli.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/img/home.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                    </div>
+                    <h1></h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by LiangsLi on
+                        2018-11-05
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1 id="Python命令行命令解析器argparse使用总结"><a href="#Python命令行命令解析器argparse使用总结" class="headerlink" title="Python命令行命令解析器argparse使用总结"></a>Python命令行命令解析器argparse使用总结</h1><p>TensorFlow项目中一般都需要我们通过命令行传入参数以配置网络细节和训练过程，TensorFlow项目一般存在两种参数传递方式：一种是采用TensorFlow的tf.flags子模块，一种是使用argparse，argparse是python原生支持的命令行参数解析器，其支持所有的Python项目而不仅仅是TensorFlow项目，具有更好的适用性，这里我们重点介绍argparse模块的使用。关于这两种参数解析方式的比较讨论参见<a href="https://stackoverflow.com/questions/33932901/whats-the-purpose-of-tf-app-flags-in-tensorflow" target="_blank" rel="noopener">这里</a>.</p>
+<h2 id="1-基本的参数解析流程"><a href="#1-基本的参数解析流程" class="headerlink" title="1.基本的参数解析流程"></a>1.基本的参数解析流程</h2><p>argparse是一个命令行参数解析器，负责从<code>sys.argv</code>中解析程序所需的参数，同时argparse还可以自动生成帮助信息和错误提示。</p>
+<p>使用argparse的第一步是创建一个ArgumentParser对象：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">parser = argparse.ArgumentParser(description=<span class="string">'Process some integers.'</span>)</span><br></pre></td></tr></table></figure>
+<p>ArgumentParser对象保存了命令行参数解析所需的所有信息</p>
+<p>创建ArgumentParser对象之后，需要向其声明程序所需的参数信息（几个参数、是否必须、参数类型等等），这一步需要使用add_argument()方法实现。add_argument()方法告诉ArgumentParser对象将命令行参数转换为程序所需的何种类型。当parse_args()方法被调用时，将基于这些参数信息转换命令行参数。</p>
+<p><strong>注意：所有的命令行参数都是string类型</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">parser.add_argument(<span class="string">'integers'</span>, metavar=<span class="string">'N'</span>, type=int, nargs=<span class="string">'+'</span>,</span><br><span class="line">                    help=<span class="string">'an integer for the accumulator'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'--sum'</span>, dest=<span class="string">'accumulate'</span>, action=<span class="string">'store_const'</span>,</span><br><span class="line">                    const=sum, default=max,</span><br><span class="line">                     help=<span class="string">'sum the integers (default: find the max)'</span>)</span><br></pre></td></tr></table></figure>
+<p>安装上面的代码段，当parse_args方法执行时，其将返回一个对象，这个对象具有两个属性：<code>integers</code> 和 <code>accumulate</code></p>
+<blockquote>
+<p>这里 integers 是一个int类型的列表，包含一个或者多个整数，accumulate 是 sum()函数或者max()函数（这取决于 –sum 是否被显示指明）</p>
+</blockquote>
+<p>parse_args()方法负责解析命令行参数，它基于ArgumentParser声明的参数信息，将命令行参数转换为正确的类型，并执行相应的action操作。大多数情况下这一步会创建一个Namespace对象。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>parser.parse_args([<span class="string">'--sum'</span>, <span class="string">'7'</span>, <span class="string">'-1'</span>, <span class="string">'42'</span>])</span><br><span class="line">Namespace(accumulate=&lt;built-<span class="keyword">in</span> function sum&gt;, integers=[<span class="number">7</span>, <span class="number">-1</span>, <span class="number">42</span>])</span><br></pre></td></tr></table></figure>
+<p>实践中，脚本中的parse_args方法一般将不会被传入命令行参数，ArgumentParser将通过<code>sys.argv</code>自动确定命令行参数。</p>
+<h2 id="2-ArgumentParser类型"><a href="#2-ArgumentParser类型" class="headerlink" title="2.ArgumentParser类型"></a>2.ArgumentParser类型</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">argparse</span>.<span class="title">ArgumentParser</span><span class="params">(prog=None, usage=None, description=None, epilog=None, </span></span></span><br><span class="line"><span class="class"><span class="params">                              parents=[], formatter_class=argparse.HelpFormatter, </span></span></span><br><span class="line"><span class="class"><span class="params">                              prefix_chars=<span class="string">'-'</span>, fromfile_prefix_chars=None, </span></span></span><br><span class="line"><span class="class"><span class="params">                              argument_default=None, conflict_handler=<span class="string">'error'</span>, </span></span></span><br><span class="line"><span class="class"><span class="params">                              add_help=True, allow_abbrev=True)</span></span></span><br></pre></td></tr></table></figure>
+<p>ArgumentParser类将创建一个ArgumentParser对象。所有的参数（注意这里的参数指的是创建ArgumentParser类时的参数）都应当被当做一个 <code>关键字参数</code>（keyword arguments） 传入。</p>
+<p>ArgumentParser类参数的简单说明：</p>
+<ul>
+<li><code>prog</code> - 程序的名字，默认为sys.argv[0]</li>
+<li><code>usage</code> - 程序的使用说明(default: generated from arguments added to parser)</li>
+<li><code>description</code> - Text to display <strong>before</strong> the argument help (default: none)</li>
+<li><code>epilog</code> - Text to display <strong>after</strong> the argument help (default: none)</li>
+<li><code>parents</code> - A list of ArgumentParser objects whose arguments should also be included</li>
+<li><code>formatter_class</code> - A class for customizing the help output</li>
+<li><code>prefix_chars</code> - The set of characters that prefix optional arguments (default: ‘-‘)</li>
+<li><code>fromfile_prefix_chars</code> - The set of characters that prefix files from which additional arguments should be read (default: None)</li>
+<li><code>argument_default</code> - The global default value for arguments (default: None)</li>
+<li><code>conflict_handler</code> - The strategy for resolving conflicting optionals (usually unnecessary)</li>
+<li><code>add_help</code> - Add a -h/–help option to the parser (default: True)</li>
+<li><code>allow_abbrev</code> - Allows long options to be abbreviated if the abbreviation is unambiguous. (default: True)</li>
+</ul>
+<p>实例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">parser = argparse.ArgumentParser(description=<span class="string">'Process some integers.'</span>)</span><br></pre></td></tr></table></figure>
+<p>实际使用中往往只用description一个参数，甚至不传入任何参数，因此不展开介绍以上的参数了。详情点击→→<a href="https://docs.python.org/3/library/argparse.html#argumentparser-objects" target="_blank" rel="noopener">关于ArgumentParser更详细的API介绍</a></p>
+<h2 id="3-add-argument-方法"><a href="#3-add-argument-方法" class="headerlink" title="3.add_argument()方法"></a>3.add_argument()方法</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ArgumentParser.add_argument(name <span class="keyword">or</span> flags...[, action][, nargs][, const][, default]</span><br><span class="line">                            [, type][, choices][, required][, help][, metavar][, dest])</span><br></pre></td></tr></table></figure>
+<p>add_argument()方法负责定义一个string类型的命令行参数如何解析：</p>
+<ul>
+<li><code>name or flags</code> - Either a name or a list of option strings, e.g. foo or -f, –foo.</li>
+<li><code>action</code> - The basic type of action to be taken when this argument is encountered at the command line.</li>
+<li><code>nargs</code> - The number of command-line arguments that should be consumed.</li>
+<li><code>const</code> - A constant value required by some action and nargs selections.</li>
+<li><code>default</code> - The value produced if the argument is absent from the command line.</li>
+<li>type - The type to which the command-line argument should be converted.</li>
+<li>choices - A container of the allowable values for the argument.</li>
+<li>required - Whether or not the command-line option may be omitted (optionals only).</li>
+<li>help - A brief description of what the argument does.</li>
+<li>metavar - A name for the argument in usage messages.</li>
+<li>dest - The name of the attribute to be added to the object returned by parse_args().</li>
+</ul>
+<p><a href="https://docs.python.org/3/library/argparse.html#the-add-argument-method" target="_blank" rel="noopener">关于add_argument()方法的更详细的API介绍</a></p>
+<h3 id="3-1-name-or-flags"><a href="#3-1-name-or-flags" class="headerlink" title="3.1 name or flags:"></a>3.1 name or flags:</h3><p>命令行参数分为 位置参数（positional argument，不可省略，必须给出）和 可选参数（optional argument，可以省略），add_argument方法通过输入它的第一个参数<code>name or flags</code>判断是位置参数还是可选参数。</p>
+<p>如果为位置参数，那么name or flags 参数为一个字符串（指明对应的命令行位置参数的名称）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">parser.add_argument(<span class="string">'bar'</span>)</span><br></pre></td></tr></table></figure>
+<p>如果为可选参数，那么name or flags 参数为flags序列：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">parser.add_argument(<span class="string">'-f'</span>, <span class="string">'--foo'</span>)</span><br></pre></td></tr></table></figure>
+<p>可选参数在程序执行时必须以 <code>-flag</code> 的形式给出，位置参数不需要指明名称：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line">parser = argparse.ArgumentParser()</span><br><span class="line">parser.add_argument(<span class="string">"square"</span>, type=int)</span><br><span class="line">parser.add_argument(<span class="string">"-v"</span>, <span class="string">"--verbose"</span>)</span><br><span class="line">args = parser.parse_args()</span><br></pre></td></tr></table></figure>
+<p>脚本执行：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="keyword">python3</span> prog.<span class="keyword">py</span> <span class="number">4</span> --<span class="keyword">verbose</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<h3 id="3-2-type"><a href="#3-2-type" class="headerlink" title="3.2 type:"></a>3.2 type:</h3><p>需要注意命令行参数都是string类型的，因此如果程序需要其他类型的数据，那么就需要在add_argument方法中指明该参数的正确类型，type参数负责执行必要的类型检查和类型转换。</p>
+<p>实例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">parser.add_argument(<span class="string">"--num_gpus"</span>, type=int, default=<span class="number">1</span>,</span><br><span class="line">                      help=<span class="string">"Number of gpus in each worker."</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="3-3-default"><a href="#3-3-default" class="headerlink" title="3.3 default:"></a>3.3 default:</h3><p>当可选参数被省略时，其默认值为<code>None</code>，如果希望其具有其他默认值，可以使用default参数指明：</p>
+<p>实例：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">parser.add_argument(<span class="string">"--num_gpus"</span>, <span class="attribute">type</span>=int, <span class="attribute">default</span>=1,</span><br><span class="line">                      <span class="attribute">help</span>=<span class="string">"Number of gpus in each worker."</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="3-4-help"><a href="#3-4-help" class="headerlink" title="3.4 help:"></a>3.4 help:</h3><p>argparse会自动生成帮助信息，允许用户在脚本执行时输入<code>-h</code>或者<code>--help</code>获取帮助信息，如果希望为每个参数指定说明信息，可以使用help参数</p>
+<p>实例：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">parser.add_argument(<span class="string">"--num_gpus"</span>, <span class="attribute">type</span>=int, <span class="attribute">default</span>=1,</span><br><span class="line">                      <span class="attribute">help</span>=<span class="string">"Number of gpus in each worker."</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="3-5-nargs："><a href="#3-5-nargs：" class="headerlink" title="3.5 nargs："></a>3.5 nargs：</h3><p>默认一条add_argument()方法调用对应一个命令行参数，但是<code>nargs</code>参数允许将多个命令行参数对应于一条add_argument()方法调用（即nargs指明了一个命令行参数包含的数值个数）。</p>
+<p><code>nargs</code>允许的值为：<code>N(一个整数)</code>、<code>&#39;?&#39;</code>、<code>&#39;*&#39;</code>、<code>&#39;+&#39;</code>、<code>argparse.REMAINDER</code>.</p>
+<ul>
+<li><p><code>N</code>:N 指明了一个命令行参数对应多少个数值，这些数值将会被打包成一个list：</p>
+<blockquote>
+<p><strong>注意： nargs=1时将返回一个只包含一个数值的list，这和默认情况不同！</strong></p>
+</blockquote>
+<p>示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>parser = argparse.ArgumentParser()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>parser.add_argument(<span class="string">'--foo'</span>, nargs=<span class="number">2</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>parser.add_argument(<span class="string">'bar'</span>, nargs=<span class="number">1</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>parser.parse_args(<span class="string">'c --foo a b'</span>.split())</span><br><span class="line">Namespace(bar=[<span class="string">'c'</span>], foo=[<span class="string">'a'</span>, <span class="string">'b'</span>])</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>&#39;?&#39;</code>:One argument will be consumed from the command line if possible, and produced as a single item. If no command-line argument is present, the value from default will be produced. Note that for optional arguments, there is an additional case - the option string is present but not followed by a command-line argument. In this case the value from const will be produced.</p>
+</li>
+<li><p><code>&#39;+&#39;</code>:</p>
+</li>
+<li><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">'*</span>'</span><br></pre></td></tr></table></figure>
+<p>:</p>
+<h3 id="3-6-const："><a href="#3-6-const：" class="headerlink" title="3.6 const："></a>3.6 const：</h3><p>The</p>
+</li>
+</ul>
+  <figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span></span><br></pre></td></tr></table></figure>
+<p>  argument of</p>
+  <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">add_argument</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
+<p>  is used to hold constant values that are</p>
+<p>  not read from the command line</p>
+<p>  but are required for the various</p>
+  <figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ArgumentParser</span></span><br></pre></td></tr></table></figure>
+<p>  actions.</p>
+<ul>
+<li><p>When add_argument() is called with action=’store_const’ or action=’append_const’. These actions add the const value to one of the attributes of the object returned by parse_args(). See the action description for examples.</p>
+</li>
+<li><p>When add_argument() is called with option strings (like -f or –foo) and nargs=’?’. This creates an optional argument that can be followed by zero or one command-line arguments. When parsing the command line, if the option string is encountered with no command-line argument following it, the value of const will be assumed instead.</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">parser.add_argument(<span class="string">"--override_loaded_hparams"</span>, <span class="attribute">type</span>=<span class="string">"bool"</span>, <span class="attribute">nargs</span>=<span class="string">"?"</span>,</span><br><span class="line">                      <span class="attribute">const</span>=<span class="literal">True</span>, <span class="attribute">default</span>=<span class="literal">False</span>,</span><br><span class="line">                      <span class="attribute">help</span>=<span class="string">"Override loaded hparams with values specified"</span>)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="3-7-action"><a href="#3-7-action" class="headerlink" title="3.7 action:"></a>3.7 action:</h3><p><code>ArgumentParser</code> objects associate command-line arguments with actions. These actions can do just about anything with the command-line arguments associated with them, though most actions simply add an attribute to the object returned by <code>parse_args()</code>. The <code>action</code> keyword argument specifies how the command-line arguments should be handled.<br><code>action</code>允许的值有：<code>&#39;store&#39;</code>、<code>&#39;store_const&#39;</code>、<code>&#39;store_true/false&#39;</code>、<code>&#39;append&#39;</code>、<code>&#39;count&#39;</code>等</p>
+<h2 id="4-parse-args-方法："><a href="#4-parse-args-方法：" class="headerlink" title="4.parse_args()方法："></a>4.parse_args()方法：</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ArgumentParser.parse_args(<span class="attribute">args</span>=None, <span class="attribute">namespace</span>=None)</span><br></pre></td></tr></table></figure>
+<p>按照add_argument方法提供的信息处理命令行参数(并执行错误检查)，创建一个Namespace对象，将处理后的命令行参数填充为该Namespace对象的属性，并返回填充后的Namespace对象。</p>
+<ul>
+<li><code>args</code> - List of strings to parse. The default is taken from sys.argv.</li>
+<li><code>namespace</code> - An object to take the attributes. The default is a new empty Namespace object.</li>
+</ul>
+<p>Namespace类非常简单，其包含多个只读的string属性，你可以使用Python内建函数<code>vars()</code>查看Namespace对象的字典视图：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;</span>&gt; parser = argparse.ArgumentParser()</span><br><span class="line"><span class="meta">&gt;&gt;</span>&gt; parser.add_argument(<span class="string">'--foo'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;</span>&gt; args = parser.parse_args([<span class="string">'--foo'</span>, <span class="string">'BAR'</span>])</span><br><span class="line"><span class="meta">&gt;&gt;</span>&gt; vars(args)</span><br><span class="line">&#123;<span class="string">'foo'</span>: <span class="string">'BAR'</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>你可以直接使用add_argument()方法中定义的命令行参数的flag或者name读取对应的命令行参数值：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line">parser = argparse.ArgumentParser()</span><br><span class="line">parser.add_argument(<span class="string">"square"</span>, type=int)</span><br><span class="line">parser.add_argument(<span class="string">"-v"</span>, <span class="string">"--verbosity"</span>, type=int)</span><br><span class="line">args = parser.parse_args()</span><br><span class="line">answer = args.square**<span class="number">2</span> <span class="comment">#读取square命令行参数的数值</span></span><br><span class="line"><span class="keyword">if</span> args.verbosity == <span class="number">2</span>: <span class="comment">#读取verbosity可选命令行参数的数值</span></span><br><span class="line">  <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<h2 id="5-其他方法："><a href="#5-其他方法：" class="headerlink" title="5.其他方法："></a>5.其他方法：</h2><h2 id="6-TensorFlow-项目实例中的参数处理解析："><a href="#6-TensorFlow-项目实例中的参数处理解析：" class="headerlink" title="6.TensorFlow 项目实例中的参数处理解析："></a>6.TensorFlow 项目实例中的参数处理解析：</h2><h2 id="reference"><a href="#reference" class="headerlink" title="reference:"></a>reference:</h2><ul>
+<li><a href="https://docs.python.org/3/howto/argparse.html#id1" target="_blank" rel="noopener">argparse tutorial</a></li>
+<li><a href="https://docs.python.org/3/library/argparse.html" target="_blank" rel="noopener">argparse API</a></li>
+<li><a href="http://wiki.jikexueyuan.com/project/explore-python/Standard-Modules/argparse.html" target="_blank" rel="noopener">argparse 教程</a></li>
+</ul>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2018/11/05/Pytorch-Autograd mechanics 笔记/" data-toggle="tooltip" data-placement="top" title="">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2018/11/05/Python 面向对象编程/" data-toggle="tooltip" data-placement="top" title="Python 面向对象编程">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="null" target="_blank">null</a></li>
+                    
+                        <li><a href="null" target="_blank">null</a></li>
+                    
+                        <li><a href="#" target="_blank">Foo</a></li>
+                    
+                        <li><a href="#" target="_blank">Bar</a></li>
+                    
+                        <li><a href="#" target="_blank">Example Friends</a></li>
+                    
+                        <li><a href="#" target="_blank">It helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "hexo-theme-huxblog";
+    var disqus_identifier = "https://liangsli.github.io/2018/11/05/Python命令行命令解析器argparse使用总结/";
+    var disqus_url = "https://liangsli.github.io/2018/11/05/Python命令行命令解析器argparse使用总结/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                    <li>
+                        <a target="_blank" href="https://twitter.com/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+                
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="http://weibo.com/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.facebook.com/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.linkedin.com/in/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; LiangsLi&#39;s Page 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    Ported by <a href="http://blog.kaijun.rocks">Kaijun</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=kaijun&repo=hexo-theme-huxblog&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://liangsli.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = '4cc1f2d8f3067386cc5cdb626a202900';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<!-- Side Catalog -->
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://liangsli.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

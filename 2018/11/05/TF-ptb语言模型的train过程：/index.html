@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          LiangsLi&#39; Blog | LiangsLi&#39;s Page
+        
+    </title>
+
+    <link rel="canonical" href="https://liangsli.github.io/2018/11/05/TF-ptb语言模型的train过程：/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">LiangsLi&#39;s Page</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archives/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://liangsli.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/img/home.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                    </div>
+                    <h1></h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by LiangsLi on
+                        2018-11-05
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1 id="TF-ptb语言模型的train过程："><a href="#TF-ptb语言模型的train过程：" class="headerlink" title="TF-ptb语言模型的train过程："></a>TF-ptb语言模型的train过程：</h1><p>先计算loss，这里使用了<code>tf.contrib.seq2seq.sequence_loss</code></p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 损失函数</span></span><br><span class="line"><span class="comment"># Use the contrib sequence loss and average over the batches</span></span><br><span class="line"><span class="comment"># 计算损失</span></span><br><span class="line">loss = tf.contrib.seq2seq.sequence_loss(</span><br><span class="line">    logits,</span><br><span class="line">    input_.targets,</span><br><span class="line">    tf.ones([self.batch_size, self.num_steps], <span class="attribute">dtype</span>=data_type()),</span><br><span class="line">    <span class="attribute">average_across_timesteps</span>=<span class="literal">False</span>,</span><br><span class="line">    <span class="attribute">average_across_batch</span>=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Update the cost</span></span><br><span class="line">self._cost = tf.reduce_sum(loss)</span><br></pre></td></tr></table></figure>
+<p>接下来定义学习率,初始化为<code>0.0</code>:</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 定义学习率</span></span><br><span class="line">self._lr = tf.Variable(0.0, <span class="attribute">trainable</span>=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+<p>获取所有trainable的变量，计算梯度（计算梯度需要loss），按照超参数中的<code>config.max_grad_norm</code>执行梯度裁剪：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tvars = tf.trainable_variables()</span><br><span class="line"><span class="comment"># 计算梯度并进行梯度裁剪！！！</span></span><br><span class="line">grads, _ = tf.clip_by_global_norm(tf.gradients(self._cost, tvars),</span><br><span class="line">                                  config.max_grad_norm)</span><br></pre></td></tr></table></figure>
+<p>使用学习率初始化optimizer,这里选择了<code>GradientDescentOptimizer</code></p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 优化器、参数是学习率</span></span><br><span class="line"><span class="attr">optimizer</span> = tf.train.GradientDescentOptimizer(self._lr)</span><br></pre></td></tr></table></figure>
+<p>定义训练op，因为这里我们是自己使用底层api计算的梯度（主要原因是我们需要执行梯度裁剪），所以不能使用<code>optimizer.minize(loss)</code>，要使用<code>optimizer.apply_gradients()</code>，传入计算好的（以及裁剪后的）梯度和所有的trainable变量：</p>
+<p>(注意这里训练步数变量使用了<code>tf.train.get_or_create_global_step()</code>)</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 定义训练op</span></span><br><span class="line">self.<span class="attr">_train_op</span> = optimizer.apply_gradients(</span><br><span class="line">    zip(grads, tvars),</span><br><span class="line">    <span class="attr">global_step=tf.train.get_or_create_global_step())</span></span><br></pre></td></tr></table></figure>
+<p>更新学习率，这里的新学习率是一个placeholder，同时定义了一个更新学习率的op：<code>self._lr_update</code></p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">self.<span class="variable">_new_lr</span> = tf.placeholder(</span><br><span class="line">    tf.float32, shape=[], <span class="built_in">name</span>=<span class="string">"new_learning_rate"</span>)</span><br><span class="line">self.<span class="variable">_lr_update</span> = tf.assign(self.<span class="variable">_lr</span>, self.<span class="variable">_new_lr</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="nmt的基本模型的train过程："><a href="#nmt的基本模型的train过程：" class="headerlink" title="nmt的基本模型的train过程："></a>nmt的基本模型的train过程：</h2><p>计算loss，本程序比较复杂，包含多个跳转步骤：</p>
+<p>下面是计算loss的核心函数<code>_compute_loss</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算loss</span></span><br><span class="line"><span class="comment"># 在build_graph 中被调用</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_compute_loss</span><span class="params">(self, logits)</span>:</span></span><br><span class="line">  <span class="string">"""Compute optimization loss."""</span></span><br><span class="line">  target_output = self.iterator.target_output</span><br><span class="line">  <span class="keyword">if</span> self.time_major:</span><br><span class="line">    target_output = tf.transpose(target_output)</span><br><span class="line">  max_time = self.get_max_time(target_output)</span><br><span class="line">  <span class="comment"># logists是decoder的输出，target_output是正确的输出</span></span><br><span class="line">  crossent = tf.nn.sparse_softmax_cross_entropy_with_logits(</span><br><span class="line">      labels=target_output, logits=logits)</span><br><span class="line">  <span class="comment"># tf.sequence_mask生成序列长度掩码：</span></span><br><span class="line">  <span class="comment"># example：</span></span><br><span class="line">  <span class="comment"># test=tf.Variable([</span></span><br><span class="line">  <span class="comment">#                   [2,3],</span></span><br><span class="line">  <span class="comment">#                   [4,5],</span></span><br><span class="line">  <span class="comment">#                   [6,7]</span></span><br><span class="line">  <span class="comment">#                  ])</span></span><br><span class="line">  <span class="comment"># result = tf.sequence_mask(test, 7, dtype=tf.int32)</span></span><br><span class="line">  <span class="comment"># result.eval()</span></span><br><span class="line">  <span class="comment"># Out:</span></span><br><span class="line">  <span class="comment"># array([[[1, 1, 0, 0, 0, 0, 0],</span></span><br><span class="line">  <span class="comment">#         [1, 1, 1, 0, 0, 0, 0]],</span></span><br><span class="line">  <span class="comment">#</span></span><br><span class="line">  <span class="comment">#        [[1, 1, 1, 1, 0, 0, 0],</span></span><br><span class="line">  <span class="comment">#         [1, 1, 1, 1, 1, 0, 0]],</span></span><br><span class="line">  <span class="comment">#</span></span><br><span class="line">  <span class="comment">#        [[1, 1, 1, 1, 1, 1, 0],</span></span><br><span class="line">  <span class="comment">#         [1, 1, 1, 1, 1, 1, 1]]])</span></span><br><span class="line">  target_weights = tf.sequence_mask(</span><br><span class="line">      self.iterator.target_sequence_length, max_time, dtype=logits.dtype)</span><br><span class="line">  <span class="keyword">if</span> self.time_major:</span><br><span class="line">    target_weights = tf.transpose(target_weights)</span><br><span class="line">  <span class="comment"># crossent * target_weights的实际作用是将超出实际长度的输出的损失归零</span></span><br><span class="line">  loss = tf.reduce_sum(</span><br><span class="line">      crossent * target_weights) / tf.to_float(self.batch_size)</span><br><span class="line">  <span class="keyword">return</span> loss</span><br></pre></td></tr></table></figure>
+<p>下面简述计算loss的过程：</p>
+<p>首先在model的定义类的构造函数中，执行<code>build_graph</code>函数，<code>build_graph</code>实际是前向计算过程的计算图，其得到RNN的输出结果，返回一个元组<code>res(logits, loss, final_context_state)</code>:</p>
+<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">## Train graph</span></span><br><span class="line"><span class="meta"># 构建计算图</span></span><br><span class="line">res = self.build_graph(hparams, scope=scope)</span><br><span class="line"><span class="meta"># 构建前向计算的过程的计算图，得到rnn的输出结果（实际没有执行）</span></span><br><span class="line"><span class="meta"># res是一个元组(logits, loss, final_context_state)</span></span><br></pre></td></tr></table></figure>
+<p>下面是<code>build_graph</code>方法的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 构建seq2seq模型的前向计算过程的计算图（encoder-decoder）</span></span><br><span class="line"><span class="comment"># 在__init__中被调用</span></span><br><span class="line"><span class="comment"># 调用_build_encoder、_build_decoder</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_graph</span><span class="params">(self, hparams, scope=None)</span>:</span></span><br><span class="line">  <span class="string">"""</span></span><br><span class="line"><span class="string">      Args:</span></span><br><span class="line"><span class="string">        hparams: Hyperparameter configurations.(超参数设置类)</span></span><br><span class="line"><span class="string">        scope: VariableScope for the created subgraph; default "dynamic_seq2seq".(变量空间)</span></span><br><span class="line"><span class="string">      """</span></span><br><span class="line">  utils.print_out(<span class="string">"# creating %s graph ..."</span> % self.mode)</span><br><span class="line">  dtype = tf.float32</span><br><span class="line"></span><br><span class="line">  <span class="keyword">with</span> tf.variable_scope(scope <span class="keyword">or</span> <span class="string">"dynamic_seq2seq"</span>, dtype=dtype):</span><br><span class="line">    <span class="comment"># Encoder</span></span><br><span class="line">    <span class="comment"># 创建并运行一个encoder</span></span><br><span class="line">    <span class="comment"># _build_encoder是抽象方法（留给子类实现）</span></span><br><span class="line">    <span class="comment"># 输入是超参数设置类</span></span><br><span class="line">    encoder_outputs, encoder_state = self._build_encoder(hparams)</span><br><span class="line">    <span class="comment"># decoder之前要先执行encoder</span></span><br><span class="line">    <span class="comment">## Decoder</span></span><br><span class="line">    <span class="comment"># 创建并运行一个decoder</span></span><br><span class="line">    <span class="comment"># 输入是encoder的输出状态和最后状态，以及超参数设置类</span></span><br><span class="line">    logits, sample_id, final_context_state = self._build_decoder(</span><br><span class="line">        encoder_outputs, encoder_state, hparams)</span><br><span class="line"></span><br><span class="line">    <span class="comment">## Loss</span></span><br><span class="line">    <span class="comment"># 计算loss，借助_compute_loss函数</span></span><br><span class="line">    <span class="keyword">if</span> self.mode != tf.contrib.learn.ModeKeys.INFER:</span><br><span class="line">      <span class="keyword">with</span> tf.device(model_helper.get_device_str(self.num_encoder_layers - <span class="number">1</span>,</span><br><span class="line">                                                 self.num_gpus)):</span><br><span class="line">        <span class="comment">#   计算损失</span></span><br><span class="line">        loss = self._compute_loss(logits)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">      loss = <span class="keyword">None</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> logits, loss, final_context_state, sample_id</span><br></pre></td></tr></table></figure>
+<p>可以看到，程序首先执行了<code>_build_encoder</code>执行了encoder，得到encoder输出，再调用<code>_build_decoder</code>，传入encoder的输出结果，得到decoder的输出，最最后调用<code>_compute_loss</code>计算损失。</p>
+<p><code>build_graph</code>函数返回的res元组中，res[1]就是loss：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="keyword">self</span>.mode == tf.contrib.learn.ModeKeys.TRAIN:</span><br><span class="line">  <span class="comment">#   如果是training模式:</span></span><br><span class="line">  <span class="comment"># 获取训练损失</span></span><br><span class="line">  <span class="keyword">self</span>.train_loss = res[<span class="number">1</span>]</span><br><span class="line"><span class="comment">#   若是在evaluation模式：</span></span><br><span class="line">elif <span class="keyword">self</span>.mode == tf.contrib.learn.ModeKeys.<span class="keyword">EVAL</span>:</span><br><span class="line">  <span class="comment"># 获取evaluation的损失</span></span><br><span class="line">  <span class="keyword">self</span>.eval_loss = res[<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+<p>定义训练步数变量：</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 初始化<span class="keyword">global</span> <span class="keyword">step</span>为<span class="number">0</span></span><br><span class="line"><span class="keyword">self</span>.global_step = tf.Variable(<span class="number">0</span>, trainable=<span class="keyword">False</span>)</span><br></pre></td></tr></table></figure>
+<p>获取所有trainable的变量：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 获取所有的可训练变量(返回一个变量list)</span></span><br><span class="line"><span class="attr">params</span> = tf.trainable_variables()</span><br></pre></td></tr></table></figure>
+<p>设置学习率：</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#   设置学习率(超参数),不可变(constant类型)</span></span><br><span class="line"><span class="keyword">self</span>.learning_rate = tf.constant(hparams.learning_rate)</span><br><span class="line"><span class="comment"># 下面设置学习率：</span></span><br><span class="line"><span class="comment"># warm-up</span></span><br><span class="line"><span class="keyword">self</span>.learning_rate = <span class="keyword">self</span>._get_learning_rate_warmup(hparams)</span><br><span class="line"><span class="comment"># decay</span></span><br><span class="line"><span class="keyword">self</span>.learning_rate = <span class="keyword">self</span>._get_learning_rate_decay(hparams)</span><br></pre></td></tr></table></figure>
+<p>简单介绍下上面学习率的设置函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改学习率：</span></span><br><span class="line"><span class="comment"># 在__init__中调用</span></span><br><span class="line"><span class="comment"># Get learning rate warmup.</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_get_learning_rate_warmup</span><span class="params">(self, hparams)</span>:</span></span><br><span class="line">  <span class="string">"""Get learning rate warmup."""</span></span><br><span class="line">  warmup_steps = hparams.warmup_steps</span><br><span class="line">  warmup_scheme = hparams.warmup_scheme</span><br><span class="line">  utils.print_out(<span class="string">"  learning_rate=%g, warmup_steps=%d, warmup_scheme=%s"</span> %</span><br><span class="line">                  (hparams.learning_rate, warmup_steps, warmup_scheme))</span><br><span class="line"></span><br><span class="line">  <span class="comment"># Apply inverse decay if global steps less than warmup steps.</span></span><br><span class="line">  <span class="comment"># Inspired by https://arxiv.org/pdf/1706.03762.pdf(Attention is all you need) (Section 5.3)</span></span><br><span class="line">  <span class="comment"># When step &lt; warmup_steps,</span></span><br><span class="line">  <span class="comment">#   learing_rate *= warmup_factor ** (warmup_steps - step)</span></span><br><span class="line">  <span class="keyword">if</span> warmup_scheme == <span class="string">"t2t"</span>:</span><br><span class="line">    <span class="comment"># 0.01^(1/warmup_steps): we start with a lr, 100 times smaller</span></span><br><span class="line">    warmup_factor = tf.exp(tf.log(<span class="number">0.01</span>) / warmup_steps)</span><br><span class="line">    inv_decay = warmup_factor**(</span><br><span class="line">        tf.to_float(warmup_steps - self.global_step))</span><br><span class="line">  <span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">raise</span> ValueError(<span class="string">"Unknown warmup scheme %s"</span> % warmup_scheme)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> tf.cond(</span><br><span class="line">      self.global_step &lt; hparams.warmup_steps,</span><br><span class="line">      <span class="keyword">lambda</span>: inv_decay * self.learning_rate,</span><br><span class="line">      <span class="keyword">lambda</span>: self.learning_rate,</span><br><span class="line">      name=<span class="string">"learning_rate_warump_cond"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改学习率：</span></span><br><span class="line"><span class="comment"># 在__init__中调用</span></span><br><span class="line"><span class="comment"># Get learning rate decay.</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_get_learning_rate_decay</span><span class="params">(self, hparams)</span>:</span></span><br><span class="line">  <span class="string">"""Get learning rate decay."""</span></span><br><span class="line">  <span class="keyword">if</span> hparams.decay_scheme <span class="keyword">in</span> [<span class="string">"luong5"</span>, <span class="string">"luong10"</span>, <span class="string">"luong234"</span>]:</span><br><span class="line">    decay_factor = <span class="number">0.5</span></span><br><span class="line">    <span class="keyword">if</span> hparams.decay_scheme == <span class="string">"luong5"</span>:</span><br><span class="line">      start_decay_step = int(hparams.num_train_steps / <span class="number">2</span>)</span><br><span class="line">      decay_times = <span class="number">5</span></span><br><span class="line">    <span class="keyword">elif</span> hparams.decay_scheme == <span class="string">"luong10"</span>:</span><br><span class="line">      start_decay_step = int(hparams.num_train_steps / <span class="number">2</span>)</span><br><span class="line">      decay_times = <span class="number">10</span></span><br><span class="line">    <span class="keyword">elif</span> hparams.decay_scheme == <span class="string">"luong234"</span>:</span><br><span class="line">      start_decay_step = int(hparams.num_train_steps * <span class="number">2</span> / <span class="number">3</span>)</span><br><span class="line">      decay_times = <span class="number">4</span></span><br><span class="line">    remain_steps = hparams.num_train_steps - start_decay_step</span><br><span class="line">    decay_steps = int(remain_steps / decay_times)</span><br><span class="line">  <span class="keyword">elif</span> <span class="keyword">not</span> hparams.decay_scheme:  <span class="comment"># no decay</span></span><br><span class="line">    start_decay_step = hparams.num_train_steps</span><br><span class="line">    decay_steps = <span class="number">0</span></span><br><span class="line">    decay_factor = <span class="number">1.0</span></span><br><span class="line">  <span class="keyword">elif</span> hparams.decay_scheme:</span><br><span class="line">    <span class="keyword">raise</span> ValueError(<span class="string">"Unknown decay scheme %s"</span> % hparams.decay_scheme)</span><br><span class="line">  utils.print_out(<span class="string">"  decay_scheme=%s, start_decay_step=%d, decay_steps %d, "</span></span><br><span class="line">                  <span class="string">"decay_factor %g"</span> % (hparams.decay_scheme,</span><br><span class="line">                                       start_decay_step,</span><br><span class="line">                                       decay_steps,</span><br><span class="line">                                       decay_factor))</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> tf.cond(</span><br><span class="line">      self.global_step &lt; start_decay_step,</span><br><span class="line">      <span class="keyword">lambda</span>: self.learning_rate,</span><br><span class="line">      <span class="keyword">lambda</span>: tf.train.exponential_decay(</span><br><span class="line">          self.learning_rate,</span><br><span class="line">          (self.global_step - start_decay_step),</span><br><span class="line">          decay_steps, decay_factor, staircase=<span class="keyword">True</span>),</span><br><span class="line">      name=<span class="string">"learning_rate_decay_cond"</span>)</span><br></pre></td></tr></table></figure>
+<p>_get_learning_rate_warmup和_get_learning_rate_decay先后修改了学习率（其内部都是一个分支<a href="https://stackoverflow.com/questions/45517940/whats-the-difference-between-tf-cond-and-if-else" target="_blank" rel="noopener"><code>tf.cond</code>语句</a>），前者在训练的前一段时间逐渐增大学习率，后者在训练的后一段时间逐渐减小学习率，具体是执行前一个函数还是执行后一个函数由<code>self.global_step</code>决定。</p>
+<p>很自然的一个疑问是为什么这里不把两个函数合在一起写，这是因为合在一起就要写成分支语句（两个大分支，每个大分支还有两个小分支），计算图中的分支与普通程序的分支不同，这里大分支的判断条件是<code>self.global_step</code>，这里变量只有计算图执行的时候才有值，所以如果要写成分支必须用<code>tf.cond</code>（类似现在小分支写的那样），那样会使程序分支变得非常难看，因为这里没有这么做（这是我猜测的 ☺ ）</p>
+<p>下面设置optimizer，这里支持SGD或者Adam优化器：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 设置Optimizer：SGD或者Adam</span></span><br><span class="line"><span class="comment"># 如果指定使用SGD优化器:</span></span><br><span class="line"><span class="keyword">if</span> hparams.<span class="attr">optimizer</span> == <span class="string">"sgd"</span>:</span><br><span class="line">  <span class="comment">#   使用SGD训练</span></span><br><span class="line">  <span class="attr">opt</span> = tf.train.GradientDescentOptimizer(self.learning_rate)</span><br><span class="line">  <span class="comment"># 为tensorboard保存数据</span></span><br><span class="line">  tf.summary.scalar(<span class="string">"lr"</span>, self.learning_rate)</span><br><span class="line"><span class="comment">#   如果指定使用Adam优化器</span></span><br><span class="line">elif hparams.<span class="attr">optimizer</span> == <span class="string">"adam"</span>:</span><br><span class="line">  <span class="comment">#   使用Adam训练</span></span><br><span class="line">  <span class="attr">opt</span> = tf.train.AdamOptimizer(self.learning_rate)</span><br></pre></td></tr></table></figure>
+<p>计算梯度：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 计算梯度Gradients</span></span><br><span class="line"><span class="comment"># tf.gradients是一个计算梯度的低级api</span></span><br><span class="line">gradients = tf.gradients(</span><br><span class="line">    self.train_loss,</span><br><span class="line">    <span class="comment"># params包含所有的可训练变量</span></span><br><span class="line">    params,</span><br><span class="line">    colocate_gradients_with_ops=hparams.colocate_gradients_with_ops)</span><br></pre></td></tr></table></figure>
+<p>执行梯度裁剪，这里调用了<code>model_helper.gradient_clip</code>：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#   执行梯度裁剪,实际调用tf.clip_by_global_norm</span></span><br><span class="line">clipped_grads, grad_norm_summary, <span class="attr">grad_norm</span> = model_helper.gradient_clip(</span><br><span class="line">    gradients, <span class="attr">max_gradient_norm=hparams.max_gradient_norm)</span></span><br></pre></td></tr></table></figure>
+<p><code>model_helper.gradient_clip</code>实际调用<code>tf.clip_by_global_norm</code>执行梯度裁剪：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gradient_clip</span><span class="params">(gradients, max_gradient_norm)</span>:</span></span><br><span class="line">  <span class="string">"""Clipping gradients of a model."""</span></span><br><span class="line">  clipped_gradients, gradient_norm = tf.clip_by_global_norm(</span><br><span class="line">      gradients, max_gradient_norm)</span><br><span class="line">  gradient_norm_summary = [tf.summary.scalar(<span class="string">"grad_norm"</span>, gradient_norm)]</span><br><span class="line">  gradient_norm_summary.append(</span><br><span class="line">      tf.summary.scalar(<span class="string">"clipped_gradient"</span>, tf.global_norm(clipped_gradients)))</span><br></pre></td></tr></table></figure>
+<p>定义训练op：</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">self</span>.update = opt.apply_gradients(</span><br><span class="line">    <span class="comment"># zip()函数用于将可迭代的对象作为参数，将对象中对应的元素打包成一个个元组，然后返回由这些元组组成的列表。</span></span><br><span class="line">    <span class="comment">#   如果各个迭代器的元素个数不一致，则返回列表长度与最短的对象相同，利用 * 号操作符，可以将元组解压为列表。</span></span><br><span class="line">    zip(clipped_grads, params), global_step=<span class="keyword">self</span>.global_step)</span><br></pre></td></tr></table></figure>
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2018/11/05/seq2seq学习路线图/" data-toggle="tooltip" data-placement="top" title="">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/2018/11/05/TensorFlow 命名空间/" data-toggle="tooltip" data-placement="top" title="">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="null" target="_blank">null</a></li>
+                    
+                        <li><a href="null" target="_blank">null</a></li>
+                    
+                        <li><a href="#" target="_blank">Foo</a></li>
+                    
+                        <li><a href="#" target="_blank">Bar</a></li>
+                    
+                        <li><a href="#" target="_blank">Example Friends</a></li>
+                    
+                        <li><a href="#" target="_blank">It helps SEO</a></li>
+                    
+                </ul>
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "hexo-theme-huxblog";
+    var disqus_identifier = "https://liangsli.github.io/2018/11/05/TF-ptb语言模型的train过程：/";
+    var disqus_url = "https://liangsli.github.io/2018/11/05/TF-ptb语言模型的train过程：/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                    <li>
+                        <a target="_blank" href="https://twitter.com/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+                
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="http://weibo.com/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.facebook.com/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://github.com/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.linkedin.com/in/Liangs">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; LiangsLi&#39;s Page 2018 
+                    <br>
+                    Theme by <a href="http://huangxuan.me">Hux</a> 
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    Ported by <a href="http://blog.kaijun.rocks">Kaijun</a> | 
+                    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="91px" height="20px" src="https://ghbtns.com/github-btn.html?user=kaijun&repo=hexo-theme-huxblog&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://liangsli.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-49627206-1';
+    var _gaDomain = 'huangxuan.me';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = '4cc1f2d8f3067386cc5cdb626a202900';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+<!-- Side Catalog -->
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://liangsli.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

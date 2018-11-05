@@ -13,11 +13,11 @@
 
     <title>
         
-          排序总结 - LiangsLi&#39; Blog | LiangsLi&#39;s Page
+          LiangsLi&#39; Blog | LiangsLi&#39;s Page
         
     </title>
 
-    <link rel="canonical" href="https://liangsli.github.io/2018/11/05/排序总结/">
+    <link rel="canonical" href="https://liangsli.github.io/2018/11/05/Pytorch-Autograd mechanics 笔记/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -166,7 +166,7 @@
                     <div class="tags">
                         
                     </div>
-                    <h1>排序总结</h1>
+                    <h1></h1>
                     <h2 class="subheading"></h2>
                     <span class="meta">
                         Posted by LiangsLi on
@@ -189,7 +189,27 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                
+                <h1 id="Autograd-mechanics-笔记"><a href="#Autograd-mechanics-笔记" class="headerlink" title="Autograd mechanics 笔记"></a>Autograd mechanics 笔记</h1><h2 id="在反向传播中排除子图"><a href="#在反向传播中排除子图" class="headerlink" title="在反向传播中排除子图"></a>在反向传播中排除子图</h2><p>Every Tensor has a flag: <code>requires_grad</code> that allows for fine grained exclusion of subgraphs from gradient computation and can increase efficiency.</p>
+<p>每个tensor都有一个<code>requires_grad</code>属性，可以用来在反向传播中排除一部分子图，提高计算效率（通过设置某些不想让它参与反向传播的tensor该属性值为False）。该属性默认为<strong>False</strong>！</p>
+<p>only if all inputs don’t require gradient, the output also won’t require it. Backward computation is never performed in the subgraphs, where all Tensors didn’t require gradients.</p>
+<p>如果所有“输入tensor”都不要求计算梯度，那么计算后的“输出tensor”默认也不需要梯度，这样反向传播将不会经过这个子图。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = torch.randn(<span class="number">5</span>, <span class="number">5</span>)  <span class="comment"># requires_grad=False by default</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>y = torch.randn(<span class="number">5</span>, <span class="number">5</span>)  <span class="comment"># requires_grad=False by default</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a = x + y</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a.requires_grad</span><br><span class="line"><span class="keyword">False</span></span><br></pre></td></tr></table></figure>
+<p>This is especially useful when you want to freeze part of your model, or you know in advance that you’re not going to use gradients w.r.t. some parameters.</p>
+<p><code>requires_grad</code>属性非常有用，尤其是当你想“冻结”一部分网络结构的时候，或者你预知模型的某些parameters不需要计算梯度（这样就可以把子图或者部分parameter的该属性设置为False）</p>
+<p>下面的代码段展示了，当你有一个预训练的CNN网络结构时，可以冻结该CNN结构（不再更新权重），替换掉最后的全连接层，只训练最后的新全连接层：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">model = torchvision.models.resnet18(pretrained=<span class="keyword">True</span>)</span><br><span class="line"><span class="keyword">for</span> param <span class="keyword">in</span> model.parameters():</span><br><span class="line">    param.requires_grad = <span class="keyword">False</span></span><br><span class="line"><span class="comment"># Replace the last fully-connected layer</span></span><br><span class="line"><span class="comment"># Parameters of newly constructed modules have requires_grad=True by default</span></span><br><span class="line">model.fc = nn.Linear(<span class="number">512</span>, <span class="number">100</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Optimize only the classifier</span></span><br><span class="line">optimizer = optim.SGD(model.fc.parameters(), lr=<span class="number">1e-2</span>, momentum=<span class="number">0.9</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="autograd是如何工作的"><a href="#autograd是如何工作的" class="headerlink" title="autograd是如何工作的"></a>autograd是如何工作的</h2><p>autograd记录一张图表，记录在执行操作时创建数据的所有操作，为您提供一个有向无环图（DAG），其叶是输入张量，根是输出张量。通过从根到树叶追踪此图，您可以使用链规则自动计算梯度。</p>
+<p>Internally, autograd represents this graph as a graph of Function objects (really expressions), which can be apply() ed to compute the result of evaluating the graph.</p>
+<p>An important thing to note is that the graph is recreated from scratch at every iteration, and this is exactly what allows for using arbitrary Python control flow statements, that can change the overall shape and size of the graph at every iteration. You don’t have to encode all possible paths before you launch the training - what you run is what you differentiate.</p>
+<p>需要说明的一点是，计算图在每次迭代开始时都是重新建立的，这允许你使用任意的Python控制流语句，同时在每个迭代时修改模型的形状。你可以为每个迭代编写不同的计算路径，而不用预先编码所有可能的计算路径。</p>
+<h2 id="In-place操作-与-autograd"><a href="#In-place操作-与-autograd" class="headerlink" title="In-place操作 与 autograd"></a>In-place操作 与 autograd</h2><p>在autograd中支持就地操作是一件困难的事情，PyTorch官方<strong>不建议</strong>使用就地操作（in most cases）。Pytorch的内存管理十分有效，因此大部分情况下不需要使用就地操作来节约内存。</p>
+<p>There are two main reasons that limit the applicability of in-place operations:</p>
+<ol>
+<li>In-place operations can potentially overwrite values required to compute gradients.</li>
+<li>Every in-place operation actually requires the implementation to rewrite the computational graph. Out-of-place versions simply allocate new objects and keep references to the old graph, while in-place operations, require changing the creator of all inputs to the Function representing this operation. This can be tricky, especially if there are many Tensors that reference the same storage (e.g. created by indexing or transposing), and in-place functions will actually raise an error if the storage of modified inputs is referenced by any other Tensor.</li>
+</ol>
+<h2 id="In-place-correctness-checks"><a href="#In-place-correctness-checks" class="headerlink" title="In-place correctness checks"></a>In-place correctness checks</h2><p>Every tensor keeps a version counter, that is incremented every time it is marked dirty in any operation. When a Function saves any tensors for backward, a version counter of their containing Tensor is saved as well. Once you access self.saved_tensors it is checked, and if it is greater than the saved value an error is raised. This ensures that if you’re using in-place functions and not seeing any errors, you can be sure that the computed gradients are correct.</p>
+
 
                 <hr>
 
@@ -198,12 +218,12 @@
                 <ul class="pager">
                     
                         <li class="previous">
-                            <a href="/2018/11/05/命名空间/" data-toggle="tooltip" data-placement="top" title="命名空间">&larr; Previous Post</a>
+                            <a href="/2018/11/05/TensorFlow 命名空间/" data-toggle="tooltip" data-placement="top" title="">&larr; Previous Post</a>
                         </li>
                     
                     
                         <li class="next">
-                            <a href="/2018/11/05/Python命令行命令解析器argparse/" data-toggle="tooltip" data-placement="top" title="Python命令行命令解析器argparse">Next Post &rarr;</a>
+                            <a href="/2018/11/05/Python命令行命令解析器argparse使用总结/" data-toggle="tooltip" data-placement="top" title="">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -274,8 +294,8 @@
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES * * */
     var disqus_shortname = "hexo-theme-huxblog";
-    var disqus_identifier = "https://liangsli.github.io/2018/11/05/排序总结/";
-    var disqus_url = "https://liangsli.github.io/2018/11/05/排序总结/";
+    var disqus_identifier = "https://liangsli.github.io/2018/11/05/Pytorch-Autograd mechanics 笔记/";
+    var disqus_url = "https://liangsli.github.io/2018/11/05/Pytorch-Autograd mechanics 笔记/";
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
